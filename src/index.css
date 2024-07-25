@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+/* Add this to your global CSS file or in a <style> tag in your component */
+body {
+    background-image: url('https://www.transparenttextures.com/patterns/graphy.png');
+    background-color: #f7fafc; /* Tailwind's gray-100 */
+  }
