@@ -8,25 +8,29 @@ import {
 // Pages
 import Login from './Pages/Login';
 import Register from './Pages/Register';
+import Dashboard from './Pages/Dashboard';
+import History from './Pages/History';
+import Profile from './Pages/Profile';
+
+// Layout
+import RootLayout from './Layout/RootLayout';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route>
-      <Route exact path="/" element={<Login />} />
+    <>
+      <Route path="/" element={<Login />} />
       <Route path="/register" element={<Register />} />
-    </Route>
+      <Route element={<RootLayout />}>
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/history" element={<History />} />
+        <Route path="/profile" element={<Profile />} />
+      </Route>
+    </>
   )
 );
 
 function App() {
-  return (
-    // <Route>
-    //     <Route exact path="/" component={Home} />
-    //     <Route path="/register" component={Register} />
-    // </Route>
-
-    <RouterProvider router={router} />
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;
