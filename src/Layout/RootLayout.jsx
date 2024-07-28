@@ -29,11 +29,11 @@ export default function RootLayout() {
             <ul>
               <li className="mb-2">
                 <a
-                  href="/dashboard"
+                  href="/home"
                   className="flex py-2 px-4 rounded hover:bg-gray-700"
                 >
                   <FaTachometerAlt className="mr-2" />
-                  Dashboard
+                  Home
                 </a>
               </li>
               <li className="mb-2">

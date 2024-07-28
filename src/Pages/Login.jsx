@@ -1,7 +1,7 @@
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import axios from './../Utils/api';
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Required'),
@@ -9,7 +9,8 @@ const LoginSchema = Yup.object().shape({
 });
 
 export default function Login() {
-    const navigate = useNavigate()
+  const navigate = useNavigate();
+  
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
@@ -17,27 +18,29 @@ export default function Login() {
         <Formik
           initialValues={{ email: '', password: '' }}
           validationSchema={LoginSchema}
-          onSubmit={(values, {setErrors}) => {
+          onSubmit={(values, { setErrors }) => {
             // Handle form submission
             axios.post('/login', values)
               .then(response => {
-                navigate('/')
-                // Handle successful login
+                const { token, user } = response.data;
+                localStorage.setItem('token', token);
+                sessionStorage.setItem('userId', user.id);
+                navigate('/home');
                 console.log(response.data.message);
               })
               .catch(error => {
                 if (error.response && error.response.data) {
-                    // Handle registration error
-                    setErrors({ apiError: error.response.data.message });
-                  } else {
-                    console.error(error);
-                  }
-              })
+                  // Handle registration error
+                  setErrors({ apiError: error.response.data.message });
+                } else {
+                  console.error(error);
+                }
+              });
           }}
         >
           {({ isSubmitting, errors }) => (
             <Form className="space-y-4">
-                {errors.apiError && <div className="error text-red-500">{errors.apiError}</div>}
+              {errors.apiError && <div className="error text-red-500">{errors.apiError}</div>}
               <div>
                 <label
                   htmlFor="email"
@@ -76,10 +79,10 @@ export default function Login() {
               </div>
               <button
                 type="submit"
+                className="w-full bg-indigo-500 text-white py-2 px-4 rounded-md"
                 disabled={isSubmitting}
-                className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
-                Login
+                {isSubmitting ? 'Logging in...' : 'Login'}
               </button>
               <div className="form-footer">
                 <p className="text-sm text-gray-600">
