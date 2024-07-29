@@ -39,7 +39,11 @@ export default function Dashboard() {
     const fetchTodos = async () => {
       try {
         const userId = sessionStorage.getItem('userId');
-        const todos = await getTodos(userId);
+        let todos = await getTodos(userId);
+        if (!Array.isArray(todos)) {
+          todos = [];
+        }
+        
         setTodos(todos);
       } catch (error) {
         console.error('Error fetching todos', error);
@@ -47,7 +51,6 @@ export default function Dashboard() {
     };
     fetchTodos();
   }, []);
-
 
 
   const handleDelete = (index) => {
@@ -93,7 +96,11 @@ export default function Dashboard() {
           <div className="content px-5">
             <p className="text-gray-600">List of current Todos</p>
             <div className="grid grid-cols-1 gap-4 mt-4">
-              {currentTodos.map((todo, index) => (
+              {todos.length === 0 ? (
+                <div className="container">
+                  <h4>No todos start creating</h4>
+                </div>
+              ) : (currentTodos.map((todo, index) => (
                 <div
                   key={index}
                   className="bg-white p-4 rounded-lg shadow-md flex justify-between items-center"
@@ -124,8 +131,9 @@ export default function Dashboard() {
                     </button>
                   </div>
                 </div>
-              ))}
+              )))}
             </div>
+            {todos.length > 0 && (
             <div className="flex justify-center mt-4">
               <button
                 onClick={() => setCurrentPage(currentPage - 1)}
@@ -142,6 +150,7 @@ export default function Dashboard() {
                 Next
               </button>
             </div>
+          )}
           </div>
         </div>
       </PageBackground>
