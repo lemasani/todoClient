@@ -18,3 +18,27 @@ export const postTodo = async (todoData) => {
     throw error;
   }
 };
+
+export const markTodo = async (id, status) =>{
+  try {
+    const response = await axios.put(`/api/todos/${id}`, {
+      id,
+      status,
+    })
+
+    return response.data;
+  } catch (error) {
+    console.log('Error marking todo', error)
+  }
+}
+
+
+export const deleteTodo = async (id) =>{
+  try {
+    const response = await axios.delete(`/api/todos/${id}`)
+
+    return response.data;
+  } catch (error) {
+    console.log('error deleting', error)
+  }
+}

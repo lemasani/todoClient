@@ -3,30 +3,10 @@ import PageBackground from '../Components/PageBackground';
 import TodoForm from '../Components/TodoForm';
 
 // utils
-import axios from 'axios';
-import { getTodos, postTodo } from './../Utils/endpoints';
+import { getTodos, postTodo, deleteTodo, markTodo } from './../Utils/endpoints';
 
 //icons
 import { FaTrash, FaCheck, FaEdit } from 'react-icons/fa';
-
-const sampleTodos = [
-  {
-    title: 'Buy groceries',
-    description: 'Milk, Bread, Cheese, Eggs',
-    dueDate: '2023-10-10',
-  },
-  {
-    title: 'Finish project',
-    description: 'Complete the final report and submit',
-    dueDate: '2023-10-15',
-  },
-  {
-    title: 'Workout',
-    description: 'Go to the gym for a workout session',
-    dueDate: '2023-10-12',
-  },
-  // Add more todos as needed
-];
 
 function formatDate(dateString) {
   const date = new Date(dateString);
@@ -45,7 +25,6 @@ export default function Dashboard() {
   const postTodoHandler = async (todoData) => {
     try {
       const newTodo = await postTodo(todoData);
-      console.log('Todo created:', newTodo);
       setTodos([...todos, newTodo]);
       setShowTodoForm(false);
     } catch (error) {
@@ -69,21 +48,28 @@ export default function Dashboard() {
     fetchTodos();
   }, []);
 
-  const handleDelete = (index) => {
-    console.log(`Delete todo at index: ${index}`);
+  const handleDelete = async (id) => {
+    try {
+      console.log(`Delete todo id: ${id}`);
+      const response = await deleteTodo(id);
+      console.log('Deleted todo:', response);
+
+      // Update the todos state by filtering out the deleted todo
+      setTodos(todos.filter((todo) => todo._id !== id));
+    } catch (error) {
+      console.error('Error deleting todo', error);
+    }
   };
 
-  const handleStatusUpdate = async (index, status) => {
-    try {
-      const todo = sampleTodos[index];
-      const response = await axios.post('/api/todos/mark', {
-        id: todo._id,
-        status,
-      });
-      console.log(`Updated todo status: ${response.data}`);
-    } catch (error) {
-      console.error('Error updating todo status', error);
-    }
+  const handleMark = async (id, status) => {
+    console.log(`Mark todo id: ${id} as ${status}`);
+    const response = await markTodo(id, status);
+    console.log('Deleted Todo', response);
+
+    // Update the status of the todo in the state
+    setTodos(
+      todos.map((todo) => (todo._id === id ? { ...todo, status } : todo))
+    );
   };
 
   const handleEdit = (index) => {
@@ -117,33 +103,48 @@ export default function Dashboard() {
               <div>
                 <h4>No todos</h4>
               </div>
-            ) : (currentTodos.map((todo, index) => (
-              <div key={index} className="bg-white p-4 rounded-md shadow-md">
-                <h2 className="text-xl font-bold">{todo.title}</h2>
-                <p>{todo.description}</p>
-                <p>Due: {formatDate(todo.dueDate)}</p>
-                <div className="flex justify-end mt-4">
-                  <button
-                    className="text-green-500 mr-2"
-                    onClick={() => handleStatusUpdate(index, 'completed')}
-                  >
-                    <FaCheck /> Complete
-                  </button>
-                  <button
-                    className="text-blue-500 mr-2"
-                    onClick={() => handleEdit(index)}
-                  >
-                    <FaEdit /> Edit
-                  </button>
-                  <button
-                    className="text-red-500"
-                    onClick={() => handleDelete(index)}
-                  >
-                    <FaTrash /> Delete
-                  </button>
+            ) : (
+              currentTodos.map((todo) => (
+                <div
+                  key={todo._id}
+                  className={`p-4 rounded-md shadow-md ${
+                    todo.status === 'completed'
+                      ? 'bg-green-100 border-green-500'
+                      : 'bg-white'
+                  }`}
+                >
+                  <h2 className="text-xl font-bold">{todo.title}</h2>
+                  <p>{todo.description}</p>
+                  <p>Due: {formatDate(todo.dueDate)}</p>
+                  <div className="flex justify-end mt-4">
+                    <button
+                      className="text-green-500 mr-2"
+                      onClick={() => handleMark(todo._id, 'completed')}
+                    >
+                      <FaCheck /> Complete
+                    </button>
+                    {todo.status === 'completed' ? (null): (
+                      <>
+                      <button
+                        className="text-blue-500 mr-2"
+                        onClick={() => handleEdit(todo._id)}
+                      >
+                        <FaEdit /> Edit
+                      </button>
+                      <button
+                        className="text-red-500"
+                        onClick={() => handleDelete(todo._id)}
+                      >
+                        <FaTrash /> Delete
+                      </button>
+                      
+                      </>
+
+                    )}
+                  </div>
                 </div>
-              </div>
-            )))}
+              ))
+            )}
           </div>
           {todos.length > 0 && (
             <div className="flex justify-center mt-4">
