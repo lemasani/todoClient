@@ -15,15 +15,21 @@ import Profile from './Pages/Profile';
 // Layout
 import RootLayout from './Layout/RootLayout';
 
+//auth
+import ProtectedRoute from './Utils/auth';
+
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
       <Route path="/" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      <Route element={<RootLayout />}>
-        <Route path="/home" element={<Dashboard />} />
-        <Route path="/history" element={<History />} />
-        <Route path="/profile" element={<Profile />} />
+      <Route element={<ProtectedRoute />}>
+        <Route element={<RootLayout />}>
+          <Route path="/home" element={<Dashboard />} />
+          <Route path="/history" element={<History />} />
+          <Route path="/profile" element={<Profile />} />
+        </Route>
+      
       </Route>
     </>
   )

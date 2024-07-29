@@ -10,7 +10,11 @@ import {
   FaTimes,
 } from 'react-icons/fa';
 
+// auth
+import useAuth from './../Utils/auth';
+
 export default function RootLayout() {
+  useAuth()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
