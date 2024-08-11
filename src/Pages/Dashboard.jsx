@@ -99,73 +99,77 @@ export default function Dashboard() {
               {showTodoForm ? 'Cancel' : 'Create Todo'}
             </button>
           </div>
-          {showTodoForm && <TodoForm onSuccess={postTodoHandler} />}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {todos.length === 0 ? (
-              <div>
-                <h4>No todos</h4>
-              </div>
-            ) : (
-              currentTodos.map((todo) => (
-                <div
-                  key={todo._id}
-                  className={`p-4 rounded-md shadow-md ${
-                    todo.status === 'completed'
-                      ? 'bg-green-100 border-green-500'
-                      : 'bg-white'
-                  }`}
-                >
-                  <h2 className="text-xl font-bold">{todo.title}</h2>
-                  <p>{todo.description}</p>
-                  <p>Due: {formatDate(todo.dueDate)}</p>
-                  <div className="flex justify-end mt-4">
-                    <button
-                      className="text-green-500 mr-2"
-                      onClick={() => handleMark(todo._id, 'completed')}
-                    >
-                      <FaCheck /> Complete
-                    </button>
-                    {todo.status === 'completed' ? (null): (
-                      <>
-                      <button
-                        className="text-blue-500 mr-2"
-                        onClick={() => handleEdit(todo._id)}
-                      >
-                        <FaEdit /> Edit
-                      </button>
-                      <button
-                        className="text-red-500"
-                        onClick={() => handleDelete(todo._id)}
-                      >
-                        <FaTrash /> Delete
-                      </button>
-                      
-                      </>
-
-                    )}
-                  </div>
+          {showTodoForm ? (<TodoForm onSuccess={postTodoHandler} />) : (
+            <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {todos.length === 0 ? (
+                <div>
+                  <h4>No todos</h4>
                 </div>
-              ))
-            )}
-          </div>
-          {todos.length > 0 && (
-            <div className="flex justify-center mt-4">
-              <button
-                onClick={() => setCurrentPage(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="px-4 py-2 mx-1 bg-gray-300 rounded"
-              >
-                Previous
-              </button>
-              <button
-                onClick={() => setCurrentPage(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="px-4 py-2 mx-1 bg-gray-300 rounded"
-              >
-                Next
-              </button>
+              ) : (
+                currentTodos.map((todo) => (
+                  <div
+                    key={todo._id}
+                    className={`p-4 rounded-md shadow-md`}
+                  >
+                    <h2 className="text-xl font-bold">{todo.title}</h2>
+                    <p>{todo.description}</p>
+                    <p>Due: {formatDate(todo.dueDate)}</p>
+                    <div className="flex justify-end mt-4">
+                      <button
+                        className="text-green-500 mr-2"
+                        onClick={() => handleMark(todo._id, 'completed')}
+                      >
+                        <FaCheck /> Complete
+                      </button>
+                      {todo.status === 'completed' ? (null): (
+                        <>
+                        <button
+                          className="text-blue-500 mr-2"
+                          onClick={() => handleEdit(todo._id)}
+                        >
+                          <FaEdit /> Edit
+                        </button>
+                        <button
+                          className="text-red-500"
+                          onClick={() => handleDelete(todo._id)}
+                        >
+                          <FaTrash /> Delete
+                        </button>
+                        
+                        </>
+  
+                      )}
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
-          )}
+            <div>
+              {todos.length > 0 && (
+                <div className="flex justify-center mt-4">
+                  <button
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="px-4 py-2 mx-1 bg-gray-300 rounded"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="px-4 py-2 mx-1 bg-gray-300 rounded"
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
+
+            </div>
+            
+            </>
+            
+            )}
         </div>
       </PageBackground>
     </>
