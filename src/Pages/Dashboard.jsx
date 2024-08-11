@@ -40,7 +40,8 @@ export default function Dashboard() {
         if (!Array.isArray(todos)) {
           todos = [];
         }
-        setTodos(todos);
+        
+        setTodos(todos.filter((todo) => todo.status !== 'completed'));
       } catch (error) {
         console.error('Error fetching todos', error);
       }
@@ -64,11 +65,12 @@ export default function Dashboard() {
   const handleMark = async (id, status) => {
     console.log(`Mark todo id: ${id} as ${status}`);
     const response = await markTodo(id, status);
-    console.log('Deleted Todo', response);
-
-    // Update the status of the todo in the state
+    console.log('Marked Todo:', response);
+    // Update the status of the todo in the state and filter out completed todos
     setTodos(
-      todos.map((todo) => (todo._id === id ? { ...todo, status } : todo))
+      todos
+        .map((todo) => (todo._id === id ? { ...todo, status } : todo))
+        .filter((todo) => todo.status !== 'completed')
     );
   };
 
