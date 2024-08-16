@@ -8,10 +8,10 @@ const TodoSchema = Yup.object().shape({
   dueDate: Yup.date().nullable(),
 });
 
-export default function TodoForm({ onSuccess }) {
+export default function TodoForm({ initialValues, onSuccess }) {
   return (
     <Formik
-      initialValues={{ title: '', description: '', dueDate: '' }}
+      initialValues={initialValues}
       validationSchema={TodoSchema}
       onSubmit={async (values, { setSubmitting }) => {
         try {
@@ -74,5 +74,10 @@ export default function TodoForm({ onSuccess }) {
 }
 
 TodoForm.propTypes = {
+  initialValues: PropTypes.shape({
+    title: PropTypes.string,
+    description: PropTypes.string,
+    dueDate: PropTypes.string,
+  }).isRequired,
   onSuccess: PropTypes.func.isRequired,
 };

@@ -32,6 +32,15 @@ export const markTodo = async (id, status) =>{
   }
 }
 
+export const editTodo = async (id, todoData) => {
+  try {
+    const response = await axios.patch(`/api/todos/${id}`, {todoData });
+    return response.data;
+  } catch (error) {
+    console.log('error editing todo Client:', error.response.data);
+  }
+};
+
 
 export const deleteTodo = async (id) =>{
   try {

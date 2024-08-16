@@ -3,10 +3,11 @@ import PageBackground from '../Components/PageBackground';
 import TodoForm from '../Components/TodoForm';
 
 // utils
-import { getTodos, postTodo, deleteTodo, markTodo } from './../Utils/endpoints';
+import { getTodos, postTodo, deleteTodo, markTodo, editTodo } from './../Utils/endpoints';
 
 //icons
 import { FaTrash, FaCheck, FaEdit } from 'react-icons/fa';
+
 
 function formatDate(dateString) {
   const date = new Date(dateString);
@@ -21,6 +22,7 @@ export default function Dashboard() {
   const [todos, setTodos] = useState([]);
   const [showTodoForm, setShowTodoForm] = useState(false);
   const [viewMode, setViewMode] = useState('table');
+  const [editingTodo, setEditingTodo] = useState(null);
   const todosPerPage = 6;
 
   const postTodoHandler = async (todoData) => {
@@ -32,6 +34,21 @@ export default function Dashboard() {
       console.error('Error creating todo', error);
     }
   };
+
+  const editTodoHandler = async (todoData) => {
+    try {
+      const updatedTodo = await editTodo(todoData._id, todoData);
+      if (!updatedTodo) {
+        throw new Error('Failed to update todo');
+      }
+      setTodos(todos.map(todo => (todo._id === updatedTodo._id ? updatedTodo : todo)));
+      setShowTodoForm(false);
+      setEditingTodo(null);
+    } catch (error) {
+      console.error('Error updating todo', error);
+    }
+  };
+
 
   useEffect(() => {
     const fetchTodos = async () => {
@@ -52,7 +69,6 @@ export default function Dashboard() {
 
   const handleDelete = async (id) => {
     try {
-      console.log(`Delete todo id: ${id}`);
       const response = await deleteTodo(id);
       console.log('Deleted todo:', response);
 
@@ -75,8 +91,11 @@ export default function Dashboard() {
     );
   };
 
-  const handleEdit = (index) => {
-    console.log(`Edit todo at index: ${index}`);
+  const handleEdit = (todo) => {
+    console.log(`Edit todo at todo: ${todo._id}`);
+    setEditingTodo(todo);
+    setShowTodoForm(true);
+
   };
 
   // Calculate the todos to display on the current page
@@ -101,7 +120,10 @@ export default function Dashboard() {
             </button>
           </div>
           {showTodoForm ? (
-            <TodoForm onSuccess={postTodoHandler} />
+            <TodoForm
+            initialValues={editingTodo || { title: '', description: '', dueDate: '' }}
+            onSuccess={editingTodo ? editTodoHandler : postTodoHandler}
+          />
           ) : (
             <>
               <div className="todocontainer">
@@ -180,7 +202,7 @@ export default function Dashboard() {
                                   </button>
                                   <button
                                     className="text-blue-500 mr-2"
-                                    onClick={() => handleEdit(todo._id)}
+                                    onClick={() => handleEdit(todo)}
                                   >
                                     <FaEdit /> Edit
                                   </button>
@@ -227,7 +249,7 @@ export default function Dashboard() {
                                 <>
                                   <button
                                     className="text-blue-500 mr-2"
-                                    onClick={() => handleEdit(todo._id)}
+                                    onClick={() => handleEdit(todo)}
                                   >
                                     <FaEdit /> Edit
                                   </button>
