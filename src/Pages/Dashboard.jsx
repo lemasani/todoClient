@@ -20,6 +20,7 @@ export default function Dashboard() {
   const [currentPage, setCurrentPage] = useState(1);
   const [todos, setTodos] = useState([]);
   const [showTodoForm, setShowTodoForm] = useState(false);
+  const [viewMode, setViewMode] = useState('table');
   const todosPerPage = 6;
 
   const postTodoHandler = async (todoData) => {
@@ -40,7 +41,7 @@ export default function Dashboard() {
         if (!Array.isArray(todos)) {
           todos = [];
         }
-        
+
         setTodos(todos.filter((todo) => todo.status !== 'completed'));
       } catch (error) {
         console.error('Error fetching todos', error);
@@ -99,77 +100,175 @@ export default function Dashboard() {
               {showTodoForm ? 'Cancel' : 'Create Todo'}
             </button>
           </div>
-          {showTodoForm ? (<TodoForm onSuccess={postTodoHandler} />) : (
+          {showTodoForm ? (
+            <TodoForm onSuccess={postTodoHandler} />
+          ) : (
             <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {todos.length === 0 ? (
-                <div>
-                  <h4>No todos</h4>
-                </div>
-              ) : (
-                currentTodos.map((todo) => (
-                  <div
-                    key={todo._id}
-                    className={`p-4 rounded-md shadow-md`}
+              <div className="todocontainer">
+                <div className="buttonContainer mb-2">
+                  <button
+                    className={`px-4 py-2 mx-1 ${
+                      viewMode === 'table'
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-gray-300'
+                    }`}
+                    onClick={() => setViewMode('table')}
                   >
-                    <h2 className="text-xl font-bold">{todo.title}</h2>
-                    <p>{todo.description}</p>
-                    <p>Due: {formatDate(todo.dueDate)}</p>
-                    <div className="flex justify-end mt-4">
-                      <button
-                        className="text-green-500 mr-2"
-                        onClick={() => handleMark(todo._id, 'completed')}
-                      >
-                        <FaCheck /> Complete
-                      </button>
-                      {todo.status === 'completed' ? (null): (
-                        <>
-                        <button
-                          className="text-blue-500 mr-2"
-                          onClick={() => handleEdit(todo._id)}
-                        >
-                          <FaEdit /> Edit
-                        </button>
-                        <button
-                          className="text-red-500"
-                          onClick={() => handleDelete(todo._id)}
-                        >
-                          <FaTrash /> Delete
-                        </button>
-                        
-                        </>
-  
+                    Table View
+                  </button>
+                  <button
+                    className={`px-4 py-2 mx-1 ${
+                      viewMode === 'cards'
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-gray-300'
+                    }`}
+                    onClick={() => setViewMode('cards')}
+                  >
+                    Cards View
+                  </button>
+                </div>
+                {viewMode === 'table' ? (
+                  <>
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full bg-white border border-gray-200">
+                        <thead>
+                          <tr>
+                            <th className="px-2 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-sm font-semibold text-gray-600">
+                              Date
+                            </th>
+                            <th className="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-sm font-semibold text-gray-600">
+                              Title
+                            </th>
+                            <th className="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-sm font-semibold text-gray-600">
+                              Description
+                            </th>
+                            <th className="px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-sm font-semibold text-gray-600">
+                              Actions
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {currentTodos.length === 0 ? (
+                            <tr>
+                              <td
+                                colSpan="4"
+                                className="px-4 py-2 border-b border-gray-200 text-center"
+                              >
+                                No todos available
+                              </td>
+                            </tr>
+                          ) : (
+                            currentTodos.map((todo) => (
+                              <tr key={todo._id}>
+                                <td className="px-4 py-2 border-b border-gray-200">
+                                  {formatDate(todo.dueDate)}
+                                </td>
+                                <td className="px-4 py-2 border-b border-gray-200">
+                                  {todo.title}
+                                </td>
+                                <td className="px-4 py-2 border-b border-gray-200">
+                                  {todo.description}
+                                </td>
+                                <td className="px-4 py-2 border-b border-gray-200">
+                                  <button
+                                    className="text-green-500 mr-2"
+                                    onClick={() =>
+                                      handleMark(todo._id, 'completed')
+                                    }
+                                  >
+                                    <FaCheck /> Mark Done
+                                  </button>
+                                  <button
+                                    className="text-blue-500 mr-2"
+                                    onClick={() => handleEdit(todo._id)}
+                                  >
+                                    <FaEdit /> Edit
+                                  </button>
+                                  <button
+                                    className="text-red-500"
+                                    onClick={() => handleDelete(todo._id)}
+                                  >
+                                    <FaTrash /> Delete
+                                  </button>
+                                </td>
+                              </tr>
+                            ))
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {todos.length === 0 ? (
+                        <div>
+                          <h4>No todos</h4>
+                        </div>
+                      ) : (
+                        currentTodos.map((todo) => (
+                          <div
+                            key={todo._id}
+                            className={`p-4 rounded-md shadow-md`}
+                          >
+                            <h2 className="text-xl font-bold">{todo.title}</h2>
+                            <p>{todo.description}</p>
+                            <p>Due: {formatDate(todo.dueDate)}</p>
+                            <div className="flex justify-end mt-4">
+                              <button
+                                className="text-green-500 mr-2 flex flex-col justify-center items-center"
+                                onClick={() =>
+                                  handleMark(todo._id, 'completed')
+                                }
+                              >
+                                <FaCheck /> Mark Done
+                              </button>
+                              {todo.status === 'completed' ? null : (
+                                <>
+                                  <button
+                                    className="text-blue-500 mr-2"
+                                    onClick={() => handleEdit(todo._id)}
+                                  >
+                                    <FaEdit /> Edit
+                                  </button>
+                                  <button
+                                    className="text-red-500"
+                                    onClick={() => handleDelete(todo._id)}
+                                  >
+                                    <FaTrash /> Delete
+                                  </button>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        ))
                       )}
                     </div>
-                  </div>
-                ))
-              )}
-            </div>
-            <div>
-              {todos.length > 0 && (
-                <div className="flex justify-center mt-4">
-                  <button
-                    onClick={() => setCurrentPage(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="px-4 py-2 mx-1 bg-gray-300 rounded"
-                  >
-                    Previous
-                  </button>
-                  <button
-                    onClick={() => setCurrentPage(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    className="px-4 py-2 mx-1 bg-gray-300 rounded"
-                  >
-                    Next
-                  </button>
+                  </>
+                )}
+                <div>
+                  {todos.length > 0 && (
+                    <div className="flex justify-center mt-4">
+                      <button
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        className="px-4 py-2 mx-1 bg-gray-300 rounded"
+                      >
+                        Previous
+                      </button>
+                      <button
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                        className="px-4 py-2 mx-1 bg-gray-300 rounded"
+                      >
+                        Next
+                      </button>
+                    </div>
+                  )}
                 </div>
-              )}
-
-            </div>
-            
+              </div>
             </>
-            
-            )}
+          )}
         </div>
       </PageBackground>
     </>
